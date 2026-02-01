@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: 'Cheengu - SMS Accountability System',
+  title: 'Cheengu - SMS Accountability',
   description: 'Achieve your goals with real accountability through SMS check-ins, human verification, and financial stakes.',
   icons: {
-    icon: '/icon.svg',  // Your new favicon
+    icon: '/icon.svg',
   },
 }
 
