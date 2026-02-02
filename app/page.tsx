@@ -152,7 +152,17 @@ export default function Home() {
             "I've tried every productivity app. This is the only thing that actually worked. 
             Knowing my friend would see me fail AND I'd lose money? That got me off my ass."
           </p>
-          <p className="text-[#666]">— Lukas, workout commitment</p>
+          <p className="text-[#666]">— Ross, workout commitment</p>
+        </div>
+      </div>
+      
+      <div className="max-w-[700px] mx-auto px-5 py-20 text-center">
+        <div className="bg-[#1a1a1a] border border-[#333] rounded-xl p-12">
+          <p className="text-xl text-[#aaa] mb-6 italic">
+            "I've wanted to learn a new language before but never stuck with it when I was younger. Cheengu 
+            made me actually stick with studying Korean for the first time."
+          </p>
+          <p className="text-[#666]">— Rachel, language learning commitment</p>
         </div>
       </div>
 
