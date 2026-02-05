@@ -11,14 +11,18 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
-
+  
     try {
-      const response = await fetch('/api/signup', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/signup`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_BACKEND_API_KEY}`
+        },
         body: JSON.stringify({ phone }),
       });
-
+  
+      // ... rest stays the same
       const data = await response.json();
 
       if (response.ok) {
