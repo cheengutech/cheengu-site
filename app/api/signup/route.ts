@@ -22,13 +22,13 @@ export async function POST(request: Request) {
     }
 
     // Send START SMS via backend
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://your-render-backend.onrender.com';
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://cheengu-v1.onrender.com';
     
-    const response = await fetch(`${backendUrl}/api/trigger-start`, {
+    const response = await fetch(`${backendUrl}/api/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.BACKEND_API_KEY}` // Add this to your .env
+        'Authorization': `Bearer ${process.env.NEXT_PUBLICBACKEND_API_KEY}` // Add this to your .env
       },
       body: JSON.stringify({ phone: normalizedPhone }),
     });
