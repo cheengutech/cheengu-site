@@ -221,13 +221,15 @@ export default function Home() {
           </div>
 
           <div className="bg-[#1a1a1a] border border-zinc-800 rounded-3xl p-6 shadow-2xl">
-            <div className="aspect-video bg-[#0f0f0f] rounded-2xl flex items-center justify-center relative overflow-hidden group cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent" />
-              <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center text-3xl text-black shadow-[0_0_40px_rgba(16,185,129,0.4)] group-hover:scale-110 transition-transform z-10">
-                ▶
-              </div>
-              <p className="absolute bottom-6 text-zinc-500 text-sm">Click to play demo</p>
-            </div>
+            <video 
+              className="w-full aspect-video rounded-2xl bg-[#0f0f0f]"
+              controls
+              poster="/demo-poster.png"
+              preload="metadata"
+            >
+              <source src="/demo.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           </div>
         </div>
       </section>
