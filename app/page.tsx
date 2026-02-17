@@ -68,6 +68,7 @@ export default function Home() {
         <ul className="hidden md:flex gap-8">
           <li><a href="#how-it-works" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">How It Works</a></li>
           <li><a href="#demo" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">See Demo</a></li>
+          <li><Link href="/dashboard" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">Dashboard</Link></li>
           <li><Link href="/contact" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">Contact</Link></li>
         </ul>
       </nav>
