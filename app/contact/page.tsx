@@ -22,20 +22,6 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="mb-8">
-            <div className="text-sm text-[#666] uppercase tracking-wider mb-2">Founder</div>
-            <div className="text-lg text-white">Brian Park</div>
-          </div>
-
-          <div className="mb-8">
-            <div className="text-sm text-[#666] uppercase tracking-wider mb-2">Business Address</div>
-            <div className="text-lg text-white">
-              100 34th Ave<br />
-              San Francisco, CA 94121<br />
-              United States
-            </div>
-          </div>
-
           <div>
             <div className="text-sm text-[#666] uppercase tracking-wider mb-2">Hours</div>
             <div className="text-lg text-white">
