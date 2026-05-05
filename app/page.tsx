@@ -1,31 +1,32 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { BRAND } from './brand';
 
 export default function Home() {
   const [phone, setPhone] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
-  
-  // Honeypot fields - bots will fill these, humans won't see them
+
+  // Honeypot fields — bots fill these, humans never see them
   const [website, setWebsite] = useState('');
   const [email, setEmail] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
-  
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/signup`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_BACKEND_API_KEY}`
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_BACKEND_API_KEY}`,
         },
         body: JSON.stringify({ phone, website, email }),
       });
-  
+
       const data = await response.json();
 
       if (response.ok) {
@@ -36,34 +37,34 @@ export default function Home() {
         setStatus('error');
         setMessage(data.error || 'Something went wrong. Please try again.');
       }
-    } catch (error) {
+    } catch {
       setStatus('error');
       setMessage('Failed to connect. Please try again.');
     }
   };
 
-  // SMS conversation messages for animation
   const smsMessages = [
-    { text: "I want to work out 4x this week", sent: true },
-    { text: "Nice! How much do you want to stake? ($5-$500)", sent: false },
-    { text: "$20", sent: true },
-    { text: "$20 it is! 💪 Who's going to keep you honest?", sent: false },
-    { text: "+1 555-123-4567", sent: true },
+    { text: 'I want to finish my side project by Friday', sent: true },
+    { text: 'Got it! How much do you want to stake? ($5–$500)', sent: false },
+    { text: '$50', sent: true },
+    { text: 'Who should verify you completed it?', sent: false },
+    { text: '+1 555-867-5309', sent: true },
   ];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
       {/* Noise texture overlay */}
-      <div className="fixed inset-0 opacity-[0.03] pointer-events-none z-50" 
+      <div
+        className="fixed inset-0 opacity-[0.03] pointer-events-none z-50"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
-        }} 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
       />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-40 px-6 md:px-10 py-5 flex justify-between items-center bg-gradient-to-b from-[#0a0a0a] to-transparent backdrop-blur-sm">
         <Link href="/" className="text-2xl font-bold text-emerald-500">
-          Cheengu
+          {BRAND}
         </Link>
         <ul className="hidden md:flex gap-8">
           <li><a href="#how-it-works" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">How It Works</a></li>
@@ -73,24 +74,26 @@ export default function Home() {
         </ul>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="min-h-screen flex items-center px-6 md:px-10 pt-24 pb-16 relative">
-        {/* Green glow */}
         <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[120px] animate-pulse" />
-        
+
         <div className="max-w-[1400px] mx-auto w-full grid md:grid-cols-2 gap-16 md:gap-20 items-center relative z-10">
           {/* Left: Text */}
           <div className="text-center md:text-left">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6 tracking-tight">
-              Put <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">Real Money</span> on Your Goals
+              Make a promise you{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">
+                can&apos;t quietly abandon.
+              </span>
             </h1>
             <p className="text-xl text-zinc-400 mb-10 max-w-[500px] mx-auto md:mx-0">
-              Stop lying to yourself. Stake actual cash, get verified by a friend via SMS, and finally follow through. Succeed and get your money back. Fail and lose it.
+              {BRAND} is a real-person commitment contract system. Set a stake, name someone who
+              knows you as your judge, and follow through — or lose the money.
             </p>
 
             {/* Signup Form */}
             <form onSubmit={handleSubmit} className="mb-4 max-w-[500px] mx-auto md:mx-0">
-              {/* Honeypot fields - hidden from users, bots will fill them */}
               <input
                 type="text"
                 name="website"
@@ -111,7 +114,7 @@ export default function Home() {
                 autoComplete="off"
                 aria-hidden="true"
               />
-              
+
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="tel"
@@ -127,12 +130,11 @@ export default function Home() {
                   disabled={status === 'loading'}
                   className="bg-emerald-500 text-black px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-[0_0_40px_rgba(16,185,129,0.3)] hover:shadow-[0_0_60px_rgba(16,185,129,0.4)]"
                 >
-                  {status === 'loading' ? 'Sending...' : 'Get Started'}
+                  {status === 'loading' ? 'Sending…' : 'Make a Commitment'}
                 </button>
               </div>
             </form>
 
-            {/* Status Messages */}
             {status === 'success' && (
               <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-4 max-w-[500px] mx-auto md:mx-0">
                 <p className="text-emerald-400 font-medium">{message}</p>
@@ -146,17 +148,17 @@ export default function Home() {
             )}
 
             <p className="text-sm text-zinc-600 max-w-[500px] mx-auto md:mx-0">
-              We'll text you to set up your first commitment. Takes 2 minutes via SMS.
+              We&apos;ll text you to set up your first commitment. Takes 2 minutes via SMS.
             </p>
           </div>
 
           {/* Right: Phone Mockup */}
           <div className="flex justify-center md:justify-end">
-            <div 
+            <div
               className="w-[280px] md:w-[300px] h-[580px] md:h-[620px] bg-[#1a1a1a] rounded-[44px] p-3 shadow-2xl border-2 border-zinc-800"
               style={{
                 transform: 'perspective(1000px) rotateY(-5deg) rotateX(2deg)',
-                animation: 'float 6s ease-in-out infinite'
+                animation: 'float 6s ease-in-out infinite',
               }}
             >
               <style jsx>{`
@@ -170,33 +172,30 @@ export default function Home() {
                 }
               `}</style>
               <div className="w-full h-full bg-[#0f0f0f] rounded-[36px] overflow-hidden flex flex-col">
-                {/* Notch */}
                 <div className="w-[100px] h-7 bg-[#1a1a1a] rounded-full mx-auto mt-2" />
-                
-                {/* SMS Header */}
+
                 <div className="px-4 py-3 border-b border-zinc-800 flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center font-bold text-lg">
-                    C
+                    {BRAND[0]}
                   </div>
                   <div>
-                    <div className="font-semibold">Cheengu</div>
+                    <div className="font-semibold">{BRAND}</div>
                     <div className="text-xs text-zinc-500">SMS</div>
                   </div>
                 </div>
 
-                {/* Messages */}
                 <div className="flex-1 p-4 flex flex-col gap-3 overflow-hidden">
                   {smsMessages.map((msg, i) => (
-                    <div 
+                    <div
                       key={i}
                       className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed opacity-0 ${
-                        msg.sent 
-                          ? 'bg-emerald-500 text-black self-end rounded-br-sm' 
+                        msg.sent
+                          ? 'bg-emerald-500 text-black self-end rounded-br-sm'
                           : 'bg-zinc-800 self-start rounded-bl-sm'
                       }`}
                       style={{
-                        animation: `fadeInUp 0.5s forwards`,
-                        animationDelay: `${0.5 + i * 1}s`
+                        animation: 'fadeInUp 0.5s forwards',
+                        animationDelay: `${0.5 + i * 1}s`,
                       }}
                     >
                       {msg.text}
@@ -209,21 +208,75 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="px-6 md:px-10 py-24 bg-gradient-to-b from-[#0a0a0a] to-[#111]">
+      {/* Why real people make the difference */}
+      <section className="px-6 md:px-10 py-24 bg-gradient-to-b from-[#0a0a0a] to-[#0f0f0f]">
         <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
-            <p className="text-lg text-zinc-400">Three steps to finally keeping your commitments</p>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Why real people make the difference</h2>
+            <p className="text-lg text-zinc-400">Apps can be deleted. Algorithms can be ignored. People can&apos;t.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { num: 1, icon: '🎯', title: 'Set Your Goal', desc: 'Text us your commitment and stake $5-$500. Daily habit or one-time deadline — you choose.' },
-              { num: 2, icon: '👤', title: 'Pick Your Judge', desc: 'Choose a friend to verify you. They get a text asking "Did they do it?" and reply yes or no.' },
-              { num: 3, icon: '💰', title: 'Succeed or Lose', desc: 'Complete your goal? Get your money back. Miss a day? Lose part of your stake. Real consequences.' },
+              {
+                icon: '👤',
+                title: 'Your judge knows you',
+                desc: 'Not an algorithm. A real person — a friend, partner, or colleague — who will actually call you out.',
+              },
+              {
+                icon: '💰',
+                title: 'Real money, real consequences',
+                desc: 'Stake $5–$500. Succeed and get it back. Miss your commitment and lose it. No "oops, I forgot" loophole.',
+              },
+              {
+                icon: '🔒',
+                title: 'No quiet exits',
+                desc: "You can't just delete the app and pretend it didn't happen. Your judge gets a text either way.",
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="bg-[#1a1a1a] border border-zinc-800 rounded-3xl p-10 text-center hover:border-emerald-500/50 hover:-translate-y-2 transition-all duration-300 hover:shadow-[0_20px_60px_rgba(16,185,129,0.1)]"
+              >
+                <div className="text-5xl mb-5">{item.icon}</div>
+                <h3 className="text-2xl font-semibold mb-3">{item.title}</h3>
+                <p className="text-zinc-400">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section id="how-it-works" className="px-6 md:px-10 py-24 bg-[#0f0f0f]">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
+            <p className="text-lg text-zinc-400">Three steps to a commitment you actually keep</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                num: 1,
+                icon: '🎯',
+                title: 'Make your commitment',
+                desc: `Text ${BRAND} what you're committing to and set a stake ($5–$500). Daily habit or one-time deadline — you decide.`,
+              },
+              {
+                num: 2,
+                icon: '👤',
+                title: 'Name your judge',
+                desc: 'Pick a real person who knows you. They get a simple text: "Did they do it?" They reply yes or no.',
+              },
+              {
+                num: 3,
+                icon: '✅',
+                title: 'Follow through or lose',
+                desc: 'Complete your commitment? Your stake comes back. Miss it? You lose the money. Real consequences every time.',
+              },
             ].map((step) => (
-              <div 
+              <div
                 key={step.num}
                 className="bg-[#1a1a1a] border border-zinc-800 rounded-3xl p-10 text-center hover:border-emerald-500/50 hover:-translate-y-2 transition-all duration-300 hover:shadow-[0_20px_60px_rgba(16,185,129,0.1)]"
               >
@@ -239,8 +292,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Demo Video Section */}
-      <section id="demo" className="px-6 md:px-10 py-24 bg-[#111]">
+      {/* Demo Video */}
+      <section id="demo" className="px-6 md:px-10 py-24 bg-gradient-to-b from-[#0f0f0f] to-[#111]">
         <div className="max-w-[1000px] mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">See It In Action</h2>
@@ -248,7 +301,7 @@ export default function Home() {
           </div>
 
           <div className="bg-[#1a1a1a] border border-zinc-800 rounded-3xl p-6 shadow-2xl">
-            <video 
+            <video
               className="w-full aspect-video rounded-2xl bg-[#0f0f0f]"
               controls
               poster="/demo-poster.png"
@@ -271,21 +324,21 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {[
-              { 
+              {
                 quote: "I've tried every productivity app. This is the only thing that actually worked. Knowing my friend would see me fail AND I'd lose money? That got me off my ass.",
-                name: "Ross",
-                detail: "Completed 30-day workout streak",
-                color: "from-blue-500 to-violet-500"
+                name: 'Ross',
+                detail: 'Completed 30-day workout streak',
+                color: 'from-blue-500 to-violet-500',
               },
               {
-                quote: "I've wanted to learn Korean for years but never stuck with it. Cheengu made me actually study every single day for the first time. The stakes made it real.",
-                name: "Rachel", 
-                detail: "21-day language learning streak",
-                color: "from-pink-500 to-rose-500"
-              }
+                quote: `I've wanted to learn Korean for years but never stuck with it. Real-person accountability made me actually study every single day for the first time. The stakes made it real.`,
+                name: 'Rachel',
+                detail: '21-day language learning streak',
+                color: 'from-pink-500 to-rose-500',
+              },
             ].map((t, i) => (
               <div key={i} className="bg-[#1a1a1a] border border-zinc-800 rounded-3xl p-10 relative">
-                <div className="absolute top-6 left-8 text-7xl text-emerald-500/20 font-serif">"</div>
+                <div className="absolute top-6 left-8 text-7xl text-emerald-500/20 font-serif">&ldquo;</div>
                 <p className="text-lg leading-relaxed mb-6 relative z-10">{t.quote}</p>
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 bg-gradient-to-br ${t.color} rounded-full flex items-center justify-center font-bold text-lg`}>
@@ -306,9 +359,9 @@ export default function Home() {
       <section className="px-6 md:px-10 py-16 border-y border-zinc-800">
         <div className="max-w-[1000px] mx-auto grid grid-cols-3 gap-8 text-center">
           {[
-            { stat: '87%', label: 'Completion rate with stakes' },
-            { stat: '$5-500', label: 'Flexible stake amounts' },
-            { stat: '2 min', label: 'Setup time via SMS' },
+            { stat: '87%', label: 'Completion rate with a real stake' },
+            { stat: '$5–500', label: 'Stake range' },
+            { stat: '2 min', label: 'To set up a commitment' },
           ].map((s, i) => (
             <div key={i}>
               <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600 mb-2">
@@ -323,15 +376,14 @@ export default function Home() {
       {/* Final CTA */}
       <section className="px-6 md:px-10 py-24 text-center relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/20 rounded-full blur-[120px]" />
-        
+
         <div className="relative z-10 max-w-[600px] mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Stop Making Excuses?</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Make your first commitment.</h2>
           <p className="text-xl text-zinc-400 mb-10">
-            You know what you need to do. You just need real consequences to actually do it.
+            A promise is just words. {BRAND} makes it real — with someone who knows you watching.
           </p>
 
           <form onSubmit={handleSubmit} className="max-w-[500px] mx-auto mb-4">
-            {/* Honeypot fields - hidden from users, bots will fill them */}
             <input
               type="text"
               name="website"
@@ -352,7 +404,7 @@ export default function Home() {
               autoComplete="off"
               aria-hidden="true"
             />
-            
+
             <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="tel"
@@ -368,10 +420,23 @@ export default function Home() {
                 disabled={status === 'loading'}
                 className="bg-emerald-500 text-black px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-[0_0_40px_rgba(16,185,129,0.3)] hover:shadow-[0_0_60px_rgba(16,185,129,0.4)]"
               >
-                Get Started
+                {status === 'loading' ? 'Sending…' : 'Make a Commitment'}
               </button>
             </div>
           </form>
+
+          {status === 'success' && (
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-4 max-w-[500px] mx-auto">
+              <p className="text-emerald-400 font-medium">{message}</p>
+            </div>
+          )}
+
+          {status === 'error' && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4 max-w-[500px] mx-auto">
+              <p className="text-red-400">{message}</p>
+            </div>
+          )}
+
           <p className="text-sm text-zinc-600">No app. No account. Just enter your number to get going.</p>
         </div>
       </section>
@@ -384,7 +449,7 @@ export default function Home() {
             <Link href="/terms" className="text-zinc-500 hover:text-white text-sm transition-colors">Terms</Link>
             <Link href="/contact" className="text-zinc-500 hover:text-white text-sm transition-colors">Contact</Link>
           </div>
-          <div className="text-zinc-500 text-sm">© 2025 Cheengu. All rights reserved.</div>
+          <div className="text-zinc-500 text-sm">© 2025 {BRAND}. All rights reserved.</div>
         </div>
       </footer>
     </div>
