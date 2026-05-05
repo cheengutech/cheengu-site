@@ -1,20 +1,24 @@
 import type { Metadata } from 'next'
 import './globals.css' // assuming you have global styles
+import { BRAND, BRAND_TAGLINE } from './brand'
+
+const title = `${BRAND} — Real-person commitment contracts`;
+const description = `${BRAND} is a real-person commitment contract system. Make a promise you can't quietly abandon. Set a stake, name a real judge, and follow through — or lose the money.`;
 
 export const metadata: Metadata = {
-  title: 'Cheengu - SMS Accountability',
-  description: 'Put money on your goals. Get daily SMS check-ins. A friend verifies. Succeed and get your money back. Fail and lose it.',
+  title,
+  description,
   openGraph: {
-    title: 'Cheengu - SMS Accountability',
-    description: 'Put money on your goals. Get daily SMS check-ins. A friend verifies. Succeed and get your money back. Fail and lose it.',
+    title,
+    description,
     url: 'https://cheengu.com',
-    siteName: 'Cheengu',
+    siteName: BRAND,
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Cheengu - SMS Accountability',
+        alt: `${BRAND} — ${BRAND_TAGLINE}`,
       },
     ],
     locale: 'en_US',
@@ -22,8 +26,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cheengu - SMS Accountability',
-    description: 'Put money on your goals. Get daily SMS check-ins. A friend verifies. Succeed and get your money back. Fail and lose it.',
+    title,
+    description,
     images: ['/og-image.png'],
   },
 }
