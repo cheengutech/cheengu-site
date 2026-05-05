@@ -99,10 +99,7 @@ When submitting for Twilio verification, provide:
 ## Business Information
 
 - **Business Name**: Cheengu
-- **Founder**: Brian Park
 - **Email**: hello@cheengu.com
-- **Address**: 100 34th Ave, San Francisco, CA 94121
-- **Entity Type**: Sole Proprietorship
 - **State**: California
 
 ## License
