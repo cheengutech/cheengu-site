@@ -1,457 +1,629 @@
-'use client';
-
 import Link from 'next/link';
-import { useState } from 'react';
+import RevealOnScroll from './components/RevealOnScroll';
 import { BRAND } from './brand';
 
+// TODO: wire to SMS onboarding flow
+const CTA_HREF = '#';
+
 export default function Home() {
-  const [phone, setPhone] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [message, setMessage] = useState('');
-
-  // Honeypot fields — bots fill these, humans never see them
-  const [website, setWebsite] = useState('');
-  const [email, setEmail] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('loading');
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_BACKEND_API_KEY}`,
-        },
-        body: JSON.stringify({ phone, website, email }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setStatus('success');
-        setMessage('Check your phone! We just sent you a text to get started.');
-        setPhone('');
-      } else {
-        setStatus('error');
-        setMessage(data.error || 'Something went wrong. Please try again.');
-      }
-    } catch {
-      setStatus('error');
-      setMessage('Failed to connect. Please try again.');
-    }
-  };
-
-  const smsMessages = [
-    { text: 'I want to finish my side project by Friday', sent: true },
-    { text: 'Got it! How much do you want to stake? ($5–$500)', sent: false },
-    { text: '$50', sent: true },
-    { text: 'Who should verify you completed it?', sent: false },
-    { text: '+1 555-867-5309', sent: true },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
-      {/* Noise texture overlay */}
-      <div
-        className="fixed inset-0 opacity-[0.03] pointer-events-none z-50"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
+    <div style={{ background: 'var(--bg)', color: 'var(--text)', minHeight: '100vh' }}>
 
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-40 px-6 md:px-10 py-5 flex justify-between items-center bg-gradient-to-b from-[#0a0a0a] to-transparent backdrop-blur-sm">
-        <Link href="/" className="text-2xl font-bold text-emerald-500">
-          {BRAND}
+      {/* ── NAV ── */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+        padding: '20px 40px', display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between',
+        background: 'rgba(12,11,9,0.8)',
+        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <Link href="/" style={{
+          fontFamily: 'var(--font-display, serif)', fontSize: 22,
+          fontWeight: 700, color: 'var(--text)', textDecoration: 'none', letterSpacing: '-0.3px',
+        }}>
+          {BRAND.nameBase}<span style={{ color: 'var(--accent)' }}>{BRAND.nameAccent}</span>
         </Link>
-        <ul className="hidden md:flex gap-8">
-          <li><a href="#how-it-works" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">How It Works</a></li>
-          <li><a href="#demo" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">See Demo</a></li>
-          <li><Link href="/dashboard" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">Dashboard</Link></li>
-          <li><Link href="/contact" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">Contact</Link></li>
-        </ul>
+        <a href={CTA_HREF} style={{
+          background: 'var(--text)', color: 'var(--bg)', border: 'none',
+          padding: '10px 22px', borderRadius: 6, fontFamily: 'inherit',
+          fontSize: 14, fontWeight: 500, cursor: 'pointer', textDecoration: 'none',
+        }}>
+          Create a Commitment
+        </a>
       </nav>
 
-      {/* Hero */}
-      <section className="min-h-screen flex items-center px-6 md:px-10 pt-24 pb-16 relative">
-        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[120px] animate-pulse" />
+      {/* ── HERO ── */}
+      <section style={{
+        minHeight: '100vh', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        padding: '120px 24px 80px', textAlign: 'center', position: 'relative', overflow: 'hidden',
+      }}>
+        <div style={{
+          position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)',
+          width: 700, height: 700,
+          background: 'radial-gradient(ellipse, rgba(232,201,122,0.05) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
 
-        <div className="max-w-[1400px] mx-auto w-full grid md:grid-cols-2 gap-16 md:gap-20 items-center relative z-10">
-          {/* Left: Text */}
-          <div className="text-center md:text-left">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6 tracking-tight">
-              Make a promise you{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">
-                can&apos;t quietly abandon.
-              </span>
-            </h1>
-            <p className="text-xl text-zinc-400 mb-10 max-w-[500px] mx-auto md:mx-0">
-              {BRAND} is a real-person commitment contract system. Set a stake, name someone who
-              knows you as your judge, and follow through — or lose the money.
-            </p>
+        <p style={{
+          fontSize: 11, fontWeight: 500, letterSpacing: '2.5px',
+          textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 28,
+          animation: 'fadeUp 0.6s 0.1s both',
+        }}>
+          Real commitment. Real stakes. Real people.
+        </p>
 
-            {/* Signup Form */}
-            <form onSubmit={handleSubmit} className="mb-4 max-w-[500px] mx-auto md:mx-0">
-              <input
-                type="text"
-                name="website"
-                value={website}
-                onChange={(e) => setWebsite(e.target.value)}
-                style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-              />
-              <input
-                type="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-              />
+        <h1 style={{
+          fontFamily: 'var(--font-display, serif)',
+          fontSize: 'clamp(42px, 7vw, 80px)', fontWeight: 900,
+          lineHeight: 1.08, letterSpacing: '-1.5px',
+          maxWidth: 780, marginBottom: 28,
+          animation: 'fadeUp 0.7s 0.2s both',
+        }}>
+          Make a promise you can&apos;t{' '}
+          <em style={{ fontStyle: 'italic', color: 'var(--accent)' }}>quietly abandon.</em>
+        </h1>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Your phone number"
-                  className="flex-1 bg-[#1a1a1a] border border-zinc-800 rounded-xl px-6 py-4 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500/50 text-lg transition-colors"
-                  required
-                  disabled={status === 'loading'}
-                />
-                <button
-                  type="submit"
-                  disabled={status === 'loading'}
-                  className="bg-emerald-500 text-black px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-[0_0_40px_rgba(16,185,129,0.3)] hover:shadow-[0_0_60px_rgba(16,185,129,0.4)]"
-                >
-                  {status === 'loading' ? 'Sending…' : 'Make a Commitment'}
-                </button>
+        <p style={{
+          fontSize: 'clamp(16px, 2vw, 19px)', color: 'var(--text-muted)',
+          maxWidth: 520, lineHeight: 1.65, fontWeight: 300, marginBottom: 44,
+          animation: 'fadeUp 0.7s 0.35s both',
+        }}>
+          {BRAND.name} turns serious intentions into real commitments — with a judge, reminders,
+          proof, and a final pass/fail report.
+        </p>
+
+        <div style={{
+          display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center',
+          marginBottom: 72, animation: 'fadeUp 0.7s 0.5s both',
+        }}>
+          <a href={CTA_HREF} style={{
+            background: 'var(--text)', color: 'var(--bg)',
+            padding: '15px 32px', borderRadius: 8, fontSize: 15, fontWeight: 500,
+            border: 'none', cursor: 'pointer', textDecoration: 'none', display: 'inline-block',
+          }}>
+            Create a Commitment
+          </a>
+          <a href="#how" style={{
+            background: 'transparent', color: 'var(--text-muted)',
+            padding: '15px 32px', borderRadius: 8, fontSize: 15, fontWeight: 400,
+            border: '1px solid var(--border-warm)', cursor: 'pointer',
+            textDecoration: 'none', display: 'inline-block',
+          }}>
+            See How It Works
+          </a>
+        </div>
+
+        {/* Example commitment card */}
+        <div style={{ animation: 'fadeUp 0.8s 0.65s both', width: '100%', maxWidth: 420 }}>
+          <div style={{
+            background: 'var(--surface)', border: '1px solid var(--border-warm)',
+            borderRadius: 14, padding: 28, textAlign: 'left',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(232,201,122,0.06)',
+            position: 'relative', overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+              background: 'linear-gradient(90deg, transparent, var(--accent), transparent)',
+              opacity: 0.6,
+            }} />
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              fontSize: 11, fontWeight: 500, letterSpacing: '1.5px',
+              textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 16,
+            }}>
+              <span className="dot-pulse" style={{
+                width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)',
+                display: 'inline-block',
+              }} />
+              Active Commitment
+            </div>
+            <div style={{
+              fontFamily: 'var(--font-display, serif)', fontSize: 20,
+              fontWeight: 700, lineHeight: 1.3, marginBottom: 20, color: 'var(--text)',
+            }}>
+              &ldquo;Finish my landing page by Sunday at 8 PM.&rdquo;
+            </div>
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20,
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <span style={{
+                  fontSize: 11, fontWeight: 500, letterSpacing: '1px',
+                  textTransform: 'uppercase', color: 'var(--text-dim)',
+                }}>Judge</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>Kai</span>
               </div>
-            </form>
-
-            {status === 'success' && (
-              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-4 max-w-[500px] mx-auto md:mx-0">
-                <p className="text-emerald-400 font-medium">{message}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <span style={{
+                  fontSize: 11, fontWeight: 500, letterSpacing: '1px',
+                  textTransform: 'uppercase', color: 'var(--text-dim)',
+                }}>Stake</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>$100</span>
               </div>
-            )}
-
-            {status === 'error' && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4 max-w-[500px] mx-auto md:mx-0">
-                <p className="text-red-400">{message}</p>
-              </div>
-            )}
-
-            <p className="text-sm text-zinc-600 max-w-[500px] mx-auto md:mx-0">
-              We&apos;ll text you to set up your first commitment. Takes 2 minutes via SMS.
-            </p>
-          </div>
-
-          {/* Right: Phone Mockup */}
-          <div className="flex justify-center md:justify-end">
-            <div
-              className="w-[280px] md:w-[300px] h-[580px] md:h-[620px] bg-[#1a1a1a] rounded-[44px] p-3 shadow-2xl border-2 border-zinc-800"
-              style={{
-                transform: 'perspective(1000px) rotateY(-5deg) rotateX(2deg)',
-                animation: 'float 6s ease-in-out infinite',
-              }}
-            >
-              <style jsx>{`
-                @keyframes float {
-                  0%, 100% { transform: perspective(1000px) rotateY(-5deg) rotateX(2deg) translateY(0); }
-                  50% { transform: perspective(1000px) rotateY(-5deg) rotateX(2deg) translateY(-10px); }
-                }
-                @keyframes fadeInUp {
-                  from { opacity: 0; transform: translateY(10px); }
-                  to { opacity: 1; transform: translateY(0); }
-                }
-              `}</style>
-              <div className="w-full h-full bg-[#0f0f0f] rounded-[36px] overflow-hidden flex flex-col">
-                <div className="w-[100px] h-7 bg-[#1a1a1a] rounded-full mx-auto mt-2" />
-
-                <div className="px-4 py-3 border-b border-zinc-800 flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center font-bold text-lg">
-                    {BRAND[0]}
-                  </div>
-                  <div>
-                    <div className="font-semibold">{BRAND}</div>
-                    <div className="text-xs text-zinc-500">SMS</div>
-                  </div>
-                </div>
-
-                <div className="flex-1 p-4 flex flex-col gap-3 overflow-hidden">
-                  {smsMessages.map((msg, i) => (
-                    <div
-                      key={i}
-                      className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed opacity-0 ${
-                        msg.sent
-                          ? 'bg-emerald-500 text-black self-end rounded-br-sm'
-                          : 'bg-zinc-800 self-start rounded-bl-sm'
-                      }`}
-                      style={{
-                        animation: 'fadeInUp 0.5s forwards',
-                        animationDelay: `${0.5 + i * 1}s`,
-                      }}
-                    >
-                      {msg.text}
-                    </div>
-                  ))}
-                </div>
-              </div>
+            </div>
+            <div style={{
+              background: 'var(--surface-2)', border: '1px solid var(--border)',
+              borderRadius: 8, padding: '12px 14px', fontSize: 13, color: 'var(--text-muted)',
+              marginBottom: 16,
+            }}>
+              <strong style={{ color: 'var(--text)', fontWeight: 500 }}>Proof required:</strong>{' '}
+              Live link + screenshot
+            </div>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'var(--accent-dim)', border: '1px solid rgba(232,201,122,0.2)',
+              padding: '8px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500,
+              color: 'var(--accent)',
+            }}>
+              ⏳ Waiting for judge approval
             </div>
           </div>
         </div>
       </section>
 
-      {/* Why real people make the difference */}
-      <section className="px-6 md:px-10 py-24 bg-gradient-to-b from-[#0a0a0a] to-[#0f0f0f]">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Why real people make the difference</h2>
-            <p className="text-lg text-zinc-400">Apps can be deleted. Algorithms can be ignored. People can&apos;t.</p>
-          </div>
+      <hr style={{ border: 'none', borderTop: '1px solid var(--border)', maxWidth: 1100, margin: '0 auto' }} />
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: '👤',
-                title: 'Your judge knows you',
-                desc: 'Not an algorithm. A real person — a friend, partner, or colleague — who will actually call you out.',
-              },
-              {
-                icon: '💰',
-                title: 'Real money, real consequences',
-                desc: 'Stake $5–$500. Succeed and get it back. Miss your commitment and lose it. No "oops, I forgot" loophole.',
-              },
-              {
-                icon: '🔒',
-                title: 'No quiet exits',
-                desc: "You can't just delete the app and pretend it didn't happen. Your judge gets a text either way.",
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="bg-[#1a1a1a] border border-zinc-800 rounded-3xl p-10 text-center hover:border-emerald-500/50 hover:-translate-y-2 transition-all duration-300 hover:shadow-[0_20px_60px_rgba(16,185,129,0.1)]"
-              >
-                <div className="text-5xl mb-5">{item.icon}</div>
-                <h3 className="text-2xl font-semibold mb-3">{item.title}</h3>
-                <p className="text-zinc-400">{item.desc}</p>
-              </div>
-            ))}
-          </div>
+      {/* ── PROBLEM ── */}
+      <section style={{ padding: '100px 24px', maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: 80, alignItems: 'center',
+        }}>
+          <RevealOnScroll>
+            <p style={{
+              fontSize: 11, fontWeight: 500, letterSpacing: '2.5px',
+              textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 20,
+            }}>The Problem</p>
+            <h2 style={{
+              fontFamily: 'var(--font-display, serif)',
+              fontSize: 'clamp(32px, 5vw, 54px)', fontWeight: 700,
+              lineHeight: 1.1, letterSpacing: '-0.8px', marginBottom: 24,
+            }}>
+              Private promises are easy to break.
+            </h2>
+            <div style={{ fontSize: 17, color: 'var(--text-muted)', lineHeight: 1.75, fontWeight: 300 }}>
+              <p style={{ marginBottom: 14 }}>
+                You tell yourself you&apos;ll finish the project, go to the gym, submit the application,
+                follow the trading rule, or finally ship the thing.
+              </p>
+              <p style={{ marginBottom: 14 }}>
+                Then the deadline gets fuzzy.<br />
+                The pressure disappears.<br />
+                Nobody notices.
+              </p>
+              <p style={{ marginBottom: 14 }}>And the promise quietly dies.</p>
+              <p>
+                <strong style={{ color: 'var(--text)', fontWeight: 500 }}>
+                  {BRAND.name} makes the promise visible.
+                </strong>
+              </p>
+            </div>
+          </RevealOnScroll>
+
+          <RevealOnScroll>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {[
+                '"I\'ll ship the MVP this weekend."',
+                '"I\'m starting Monday for real."',
+                '"Just one more week and I\'ll be done."',
+              ].map((text, i) => (
+                <div key={i} style={{
+                  background: 'var(--surface)', border: '1px solid var(--border)',
+                  borderRadius: 10, padding: '18px 20px', fontSize: 15,
+                  color: 'var(--text-dim)',
+                  textDecoration: 'line-through',
+                  textDecorationColor: 'rgba(224,90,78,0.5)',
+                  marginLeft: i * 24,
+                  opacity: 1 - i * 0.275,
+                }}>
+                  {text}
+                </div>
+              ))}
+            </div>
+          </RevealOnScroll>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="px-6 md:px-10 py-24 bg-[#0f0f0f]">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
-            <p className="text-lg text-zinc-400">Three steps to a commitment you actually keep</p>
-          </div>
+      <hr style={{ border: 'none', borderTop: '1px solid var(--border)', maxWidth: 1100, margin: '0 auto' }} />
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                num: 1,
-                icon: '🎯',
-                title: 'Make your commitment',
-                desc: `Text ${BRAND} what you're committing to and set a stake ($5–$500). Daily habit or one-time deadline — you decide.`,
-              },
-              {
-                num: 2,
-                icon: '👤',
-                title: 'Name your judge',
-                desc: 'Pick a real person who knows you. They get a simple text: "Did they do it?" They reply yes or no.',
-              },
-              {
-                num: 3,
-                icon: '✅',
-                title: 'Follow through or lose',
-                desc: 'Complete your commitment? Your stake comes back. Miss it? You lose the money. Real consequences every time.',
-              },
-            ].map((step) => (
-              <div
-                key={step.num}
-                className="bg-[#1a1a1a] border border-zinc-800 rounded-3xl p-10 text-center hover:border-emerald-500/50 hover:-translate-y-2 transition-all duration-300 hover:shadow-[0_20px_60px_rgba(16,185,129,0.1)]"
-              >
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center text-2xl font-bold text-black mx-auto mb-6">
+      {/* ── HOW IT WORKS ── */}
+      <section id="how" style={{ padding: '100px 24px', maxWidth: 1100, margin: '0 auto' }}>
+        <RevealOnScroll>
+          <p style={{
+            fontSize: 11, fontWeight: 500, letterSpacing: '2.5px',
+            textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 20,
+          }}>The Process</p>
+          <h2 style={{
+            fontFamily: 'var(--font-display, serif)',
+            fontSize: 'clamp(32px, 5vw, 54px)', fontWeight: 700,
+            lineHeight: 1.1, letterSpacing: '-0.8px', marginBottom: 16,
+          }}>
+            How it works.
+          </h2>
+          <p style={{ fontSize: 17, color: 'var(--text-muted)', fontWeight: 300, marginBottom: 60 }}>
+            Five steps. One promise. Someone who holds you to it.
+          </p>
+        </RevealOnScroll>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))',
+          gap: 2,
+        }}>
+          {[
+            { num: '01', title: 'Make a promise', desc: 'Write exactly what you\'ll do and by when. Specificity is accountability.' },
+            { num: '02', title: 'Choose a real judge', desc: 'Pick someone who knows you and will actually call you on it — not a stranger, not an algorithm.' },
+            { num: '03', title: 'Get reminded', desc: 'Cheengu sends timely nudges via SMS so the deadline stays alive — not buried in a to-do list.' },
+            { num: '04', title: 'Submit proof', desc: 'When the deadline arrives, submit evidence. A link, a photo, a message — whatever you agreed on.' },
+            { num: '05', title: 'Get the final report', desc: 'Your judge passes or fails you. Both of you receive a final summary. No ambiguity.' },
+          ].map((step) => (
+            <RevealOnScroll key={step.num}>
+              <div style={{
+                background: 'var(--surface)', border: '1px solid var(--border)',
+                borderRadius: 12, padding: '28px 22px',
+              }}>
+                <div style={{
+                  fontFamily: 'var(--font-display, serif)', fontSize: 36,
+                  fontWeight: 900, color: 'var(--text-dim)', lineHeight: 1, marginBottom: 16,
+                }}>
                   {step.num}
                 </div>
-                <div className="text-5xl mb-4">{step.icon}</div>
-                <h3 className="text-2xl font-semibold mb-3">{step.title}</h3>
-                <p className="text-zinc-400">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Demo Video */}
-      <section id="demo" className="px-6 md:px-10 py-24 bg-gradient-to-b from-[#0f0f0f] to-[#111]">
-        <div className="max-w-[1000px] mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">See It In Action</h2>
-            <p className="text-lg text-zinc-400">Watch how a commitment flows from start to finish</p>
-          </div>
-
-          <div className="bg-[#1a1a1a] border border-zinc-800 rounded-3xl p-6 shadow-2xl">
-            <video
-              className="w-full aspect-video rounded-2xl bg-[#0f0f0f]"
-              controls
-              poster="/demo-poster.png"
-              preload="metadata"
-            >
-              <source src="/demo.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="px-6 md:px-10 py-24 bg-gradient-to-b from-[#111] to-[#0a0a0a]">
-        <div className="max-w-[1000px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Real Results</h2>
-            <p className="text-lg text-zinc-400">From people who finally followed through</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              {
-                quote: "I've tried every productivity app. This is the only thing that actually worked. Knowing my friend would see me fail AND I'd lose money? That got me off my ass.",
-                name: 'Ross',
-                detail: 'Completed 30-day workout streak',
-                color: 'from-blue-500 to-violet-500',
-              },
-              {
-                quote: `I've wanted to learn Korean for years but never stuck with it. Real-person accountability made me actually study every single day for the first time. The stakes made it real.`,
-                name: 'Rachel',
-                detail: '21-day language learning streak',
-                color: 'from-pink-500 to-rose-500',
-              },
-            ].map((t, i) => (
-              <div key={i} className="bg-[#1a1a1a] border border-zinc-800 rounded-3xl p-10 relative">
-                <div className="absolute top-6 left-8 text-7xl text-emerald-500/20 font-serif">&ldquo;</div>
-                <p className="text-lg leading-relaxed mb-6 relative z-10">{t.quote}</p>
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 bg-gradient-to-br ${t.color} rounded-full flex items-center justify-center font-bold text-lg`}>
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <div className="font-semibold">{t.name}</div>
-                    <div className="text-sm text-zinc-500">{t.detail}</div>
-                  </div>
+                <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--text)', marginBottom: 8 }}>
+                  {step.title}
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.55, fontWeight: 300 }}>
+                  {step.desc}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="px-6 md:px-10 py-16 border-y border-zinc-800">
-        <div className="max-w-[1000px] mx-auto grid grid-cols-3 gap-8 text-center">
-          {[
-            { stat: '87%', label: 'Completion rate with a real stake' },
-            { stat: '$5–500', label: 'Stake range' },
-            { stat: '2 min', label: 'To set up a commitment' },
-          ].map((s, i) => (
-            <div key={i}>
-              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600 mb-2">
-                {s.stat}
-              </div>
-              <div className="text-zinc-400 text-sm md:text-base">{s.label}</div>
-            </div>
+            </RevealOnScroll>
           ))}
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="px-6 md:px-10 py-24 text-center relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/20 rounded-full blur-[120px]" />
+      <hr style={{ border: 'none', borderTop: '1px solid var(--border)', maxWidth: 1100, margin: '0 auto' }} />
 
-        <div className="relative z-10 max-w-[600px] mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Make your first commitment.</h2>
-          <p className="text-xl text-zinc-400 mb-10">
-            A promise is just words. {BRAND} makes it real — with someone who knows you watching.
-          </p>
-
-          <form onSubmit={handleSubmit} className="max-w-[500px] mx-auto mb-4">
-            <input
-              type="text"
-              name="website"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-              style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-            />
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-            />
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Your phone number"
-                className="flex-1 bg-[#1a1a1a] border border-zinc-800 rounded-xl px-6 py-4 text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500/50 text-lg transition-colors"
-                required
-                disabled={status === 'loading'}
-              />
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="bg-emerald-500 text-black px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-[0_0_40px_rgba(16,185,129,0.3)] hover:shadow-[0_0_60px_rgba(16,185,129,0.4)]"
-              >
-                {status === 'loading' ? 'Sending…' : 'Make a Commitment'}
-              </button>
+      {/* ── WHY IT WORKS ── */}
+      <section style={{ padding: '100px 24px', maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: 80, alignItems: 'start',
+        }}>
+          <RevealOnScroll>
+            <p style={{
+              fontSize: 11, fontWeight: 500, letterSpacing: '2.5px',
+              textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 20,
+            }}>Why It Works</p>
+            <h2 style={{
+              fontFamily: 'var(--font-display, serif)',
+              fontSize: 'clamp(32px, 5vw, 54px)', fontWeight: 700,
+              lineHeight: 1.1, letterSpacing: '-0.8px', marginBottom: 24,
+            }}>
+              Real accountability hits different.
+            </h2>
+            <div style={{ fontSize: 17, color: 'var(--text-muted)', lineHeight: 1.75, fontWeight: 300 }}>
+              <p style={{ marginBottom: 14 }}>
+                Most productivity apps are private. You track habits solo. You miss a day and you&apos;re
+                the only one who knows. It&apos;s easy to quietly reset the streak and move on.
+              </p>
+              <p style={{ marginBottom: 14 }}>
+                {BRAND.name} works because{' '}
+                <strong style={{ color: 'var(--text)', fontWeight: 500 }}>
+                  another person knows what you promised
+                </strong>{' '}
+                — and verifies whether you followed through.
+              </p>
+              <p>
+                That relationship changes everything. You&apos;re not just letting down an app.
+                You&apos;re answering to someone who matters.
+              </p>
             </div>
-          </form>
+          </RevealOnScroll>
 
-          {status === 'success' && (
-            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-4 max-w-[500px] mx-auto">
-              <p className="text-emerald-400 font-medium">{message}</p>
+          <RevealOnScroll>
+            <div style={{
+              background: 'var(--surface)', border: '1px solid var(--border-warm)',
+              borderRadius: 14, padding: 36, boxShadow: '0 24px 60px rgba(0,0,0,0.4)',
+            }}>
+              <div style={{
+                fontFamily: 'var(--font-display, serif)', fontSize: 22,
+                fontWeight: 700, fontStyle: 'italic', lineHeight: 1.45,
+                color: 'var(--text)', marginBottom: 20,
+              }}>
+                &ldquo;Having Kai actually check in made it impossible to rationalize skipping.
+                I didn&apos;t want to explain why I failed.&rdquo;
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text-dim)' }}>
+                <strong style={{ color: 'var(--text-muted)', fontWeight: 500 }}>Brian</strong>
+                {' '}— founder, lost $50 to Kai once. Now he doesn&apos;t.
+              </div>
             </div>
-          )}
-
-          {status === 'error' && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4 max-w-[500px] mx-auto">
-              <p className="text-red-400">{message}</p>
-            </div>
-          )}
-
-          <p className="text-sm text-zinc-600">No app. No account. Just enter your number to get going.</p>
+          </RevealOnScroll>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-6 md:px-10 py-10 border-t border-zinc-800">
-        <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex gap-6">
-            <Link href="/privacy" className="text-zinc-500 hover:text-white text-sm transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-zinc-500 hover:text-white text-sm transition-colors">Terms</Link>
-            <Link href="/contact" className="text-zinc-500 hover:text-white text-sm transition-colors">Contact</Link>
+      <hr style={{ border: 'none', borderTop: '1px solid var(--border)', maxWidth: 1100, margin: '0 auto' }} />
+
+      {/* ── USE CASES ── */}
+      <section style={{ padding: '100px 24px', maxWidth: 1100, margin: '0 auto' }}>
+        <RevealOnScroll>
+          <p style={{
+            fontSize: 11, fontWeight: 500, letterSpacing: '2.5px',
+            textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 20,
+          }}>Who It&apos;s For</p>
+          <h2 style={{
+            fontFamily: 'var(--font-display, serif)',
+            fontSize: 'clamp(32px, 5vw, 54px)', fontWeight: 700,
+            lineHeight: 1.1, letterSpacing: '-0.8px', marginBottom: 16,
+          }}>
+            For the commitments you keep avoiding.
+          </h2>
+          <p style={{
+            fontSize: 17, color: 'var(--text-muted)', fontWeight: 300,
+            maxWidth: 600, marginBottom: 48,
+          }}>
+            {BRAND.name} isn&apos;t for every tiny habit. It&apos;s for the things that actually matter
+            — the ones you&apos;ve been putting off for months.
+          </p>
+        </RevealOnScroll>
+
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12,
+        }}>
+          {[
+            { icon: '🚀', title: 'Builder Deadlines', desc: 'Ship the MVP. Launch the page. Send the cold email. Make the deadline real.' },
+            { icon: '💪', title: 'Fitness Challenges', desc: '30 days of workouts. A race goal. A weight target. With someone watching.' },
+            { icon: '📚', title: 'School & Studying', desc: 'Finish the paper before the all-nighter. Study for the test. Prove it to someone.' },
+            { icon: '📈', title: 'Trading & Poker Discipline', desc: 'Stick to the rules. Follow the strategy. Don\'t tilt. Your judge sees the log.' },
+            { icon: '🎨', title: 'Creative Projects', desc: 'Finish the chapter. Post the video. Ship the design. Stop waiting for perfect.' },
+            { icon: '🔄', title: 'Personal Reset Goals', desc: 'The thing you promised yourself for months. Make it real this time.' },
+          ].map((item) => (
+            <RevealOnScroll key={item.title}>
+              <div style={{
+                background: 'var(--surface)', border: '1px solid var(--border)',
+                borderRadius: 10, padding: 24,
+              }}>
+                <div style={{ fontSize: 24, marginBottom: 12 }}>{item.icon}</div>
+                <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--text)', marginBottom: 6 }}>
+                  {item.title}
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.55, fontWeight: 300 }}>
+                  {item.desc}
+                </div>
+              </div>
+            </RevealOnScroll>
+          ))}
+        </div>
+      </section>
+
+      {/* ── STAKES ── */}
+      <div style={{ background: 'var(--surface-2)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '100px 24px' }}>
+          <RevealOnScroll>
+            <p style={{
+              fontSize: 11, fontWeight: 500, letterSpacing: '2.5px',
+              textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 20,
+            }}>Stakes</p>
+            <h2 style={{
+              fontFamily: 'var(--font-display, serif)',
+              fontSize: 'clamp(32px, 5vw, 54px)', fontWeight: 700,
+              lineHeight: 1.1, letterSpacing: '-0.8px', marginBottom: 16,
+            }}>
+              Add stakes when the<br />promise needs bite.
+            </h2>
+            <p style={{
+              fontSize: 17, color: 'var(--text-muted)', fontWeight: 300,
+              maxWidth: 600, marginBottom: 48,
+            }}>
+              Money is optional. Accountability is not. Choose what makes this promise hard enough to keep.
+            </p>
+          </RevealOnScroll>
+
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12,
+          }}>
+            {[
+              { emoji: '💸', title: 'Money Stakes', desc: 'Escrow a real amount. Fail, and it\'s gone. Succeed, and it\'s yours back.' },
+              { emoji: '📣', title: 'Social Consequences', desc: 'A public post, a group announcement, or a message to the people who matter.' },
+              { emoji: '🎯', title: 'Custom Penalties', desc: 'You define what failure costs. The judge enforces it.' },
+              { emoji: '🤝', title: 'Judge Verification', desc: 'Sometimes just knowing someone you respect will review your proof is enough.' },
+            ].map((item) => (
+              <RevealOnScroll key={item.title}>
+                <div style={{
+                  background: 'var(--surface)', border: '1px solid var(--border)',
+                  borderRadius: 10, padding: 22, textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: 28, marginBottom: 10 }}>{item.emoji}</div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', marginBottom: 6 }}>
+                    {item.title}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                    {item.desc}
+                  </div>
+                </div>
+              </RevealOnScroll>
+            ))}
           </div>
-          <div className="text-zinc-500 text-sm">© 2025 {BRAND}. All rights reserved.</div>
+
+          <RevealOnScroll>
+            <p style={{ marginTop: 28, fontSize: 14, color: 'var(--text-dim)', fontStyle: 'italic' }}>
+              No money required to start. Add it when the commitment needs more weight.
+            </p>
+          </RevealOnScroll>
+        </div>
+      </div>
+
+      {/* ── COMPARISON ── */}
+      <section style={{ padding: '100px 24px', maxWidth: 1100, margin: '0 auto' }}>
+        <RevealOnScroll>
+          <p style={{
+            fontSize: 11, fontWeight: 500, letterSpacing: '2.5px',
+            textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 20,
+          }}>Positioning</p>
+          <h2 style={{
+            fontFamily: 'var(--font-display, serif)',
+            fontSize: 'clamp(32px, 5vw, 54px)', fontWeight: 700,
+            lineHeight: 1.1, letterSpacing: '-0.8px', marginBottom: 16,
+          }}>
+            Not another habit tracker.
+          </h2>
+          <div style={{ fontSize: 17, color: 'var(--text-muted)', fontWeight: 300, maxWidth: 600, marginBottom: 48 }}>
+            <p style={{ marginBottom: 14 }}>
+              Habit trackers help you record behavior. {BRAND.name} helps you make a serious promise to someone real.
+            </p>
+            <p>
+              This isn&apos;t for tracking every tiny habit. It&apos;s for{' '}
+              <strong style={{ color: 'var(--text)', fontWeight: 500 }}>
+                the commitment you keep avoiding.
+              </strong>
+            </p>
+          </div>
+        </RevealOnScroll>
+
+        <RevealOnScroll>
+          <div style={{
+            border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden',
+          }}>
+            {/* Header row */}
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+              borderBottom: '1px solid var(--border)',
+              background: 'var(--surface-2)',
+            }}>
+              <div style={{ padding: '18px 24px', fontSize: 12, fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--text-dim)', borderRight: '1px solid var(--border)' }} />
+              <div style={{ padding: '18px 24px', fontSize: 12, fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--text-dim)', borderRight: '1px solid var(--border)' }}>
+                Habit Trackers
+              </div>
+              <div style={{ padding: '18px 24px', fontSize: 12, fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--text-dim)', background: 'rgba(232,201,122,0.04)' }}>
+                {BRAND.name}
+              </div>
+            </div>
+
+            {[
+              {
+                feature: 'Accountability',
+                them: <><span style={{ color: 'var(--red)', marginRight: 6 }}>✗</span>Private — you alone</>,
+                us: <><span style={{ color: 'var(--green)', marginRight: 6 }}>✓</span>A real person verifies</>,
+              },
+              {
+                feature: 'Stakes',
+                them: <><span style={{ color: 'var(--red)', marginRight: 6 }}>✗</span>None — easy to quit</>,
+                us: <><span style={{ color: 'var(--green)', marginRight: 6 }}>✓</span>Optional but real</>,
+              },
+              {
+                feature: 'Proof',
+                them: <><span style={{ color: 'var(--red)', marginRight: 6 }}>✗</span>Self-reported streaks</>,
+                us: <><span style={{ color: 'var(--green)', marginRight: 6 }}>✓</span>Judge reviews evidence</>,
+              },
+              {
+                feature: 'Use case',
+                them: 'Daily habits, tracking',
+                us: 'The serious one-time commitment you keep avoiding',
+              },
+              {
+                feature: 'Failure cost',
+                them: <><span style={{ color: 'var(--red)', marginRight: 6 }}>✗</span>Broken streak, reset quietly</>,
+                us: <><span style={{ color: 'var(--green)', marginRight: 6 }}>✓</span>Someone else knows</>,
+              },
+            ].map((row, i, arr) => (
+              <div key={row.feature} style={{
+                display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+                borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
+              }}>
+                <div style={{ padding: '18px 24px', fontSize: 14, color: 'var(--text-muted)', borderRight: '1px solid var(--border)' }}>
+                  {row.feature}
+                </div>
+                <div style={{ padding: '18px 24px', fontSize: 14, color: 'var(--text-dim)', borderRight: '1px solid var(--border)' }}>
+                  {row.them}
+                </div>
+                <div style={{ padding: '18px 24px', fontSize: 14, color: 'var(--text)', fontWeight: 500, background: 'rgba(232,201,122,0.04)' }}>
+                  {row.us}
+                </div>
+              </div>
+            ))}
+          </div>
+        </RevealOnScroll>
+      </section>
+
+      <hr style={{ border: 'none', borderTop: '1px solid var(--border)', maxWidth: 1100, margin: '0 auto' }} />
+
+      {/* ── FINAL CTA ── */}
+      <section style={{
+        textAlign: 'center', padding: '120px 24px',
+        position: 'relative', overflow: 'hidden',
+      }}>
+        <div style={{
+          position: 'absolute', bottom: '-20%', left: '50%', transform: 'translateX(-50%)',
+          width: 600, height: 400,
+          background: 'radial-gradient(ellipse, rgba(232,201,122,0.07) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 600, margin: '0 auto' }}>
+          <RevealOnScroll>
+            <p style={{
+              fontSize: 11, fontWeight: 500, letterSpacing: '2.5px',
+              textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 20,
+            }}>Get Started</p>
+          </RevealOnScroll>
+          <RevealOnScroll>
+            <h2 style={{
+              fontFamily: 'var(--font-display, serif)',
+              fontSize: 'clamp(32px, 5vw, 54px)', fontWeight: 700,
+              lineHeight: 1.1, letterSpacing: '-0.8px', marginBottom: 16,
+            }}>
+              Ready to make it real?
+            </h2>
+          </RevealOnScroll>
+          <RevealOnScroll>
+            <p style={{
+              fontSize: 17, color: 'var(--text-muted)', fontWeight: 300,
+              lineHeight: 1.75, marginBottom: 40,
+            }}>
+              Create your first commitment, choose your judge, and make the promise harder to escape.
+            </p>
+          </RevealOnScroll>
+          <RevealOnScroll>
+            <a
+              href={CTA_HREF}
+              style={{
+                background: 'var(--text)', color: 'var(--bg)',
+                padding: '15px 40px', borderRadius: 8, fontSize: 15, fontWeight: 500,
+                border: 'none', cursor: 'pointer', textDecoration: 'none', display: 'inline-block',
+              }}
+            >
+              Create a Commitment
+            </a>
+          </RevealOnScroll>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer style={{
+        borderTop: '1px solid var(--border)', padding: '32px 40px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        maxWidth: 1100, margin: '0 auto',
+      }}>
+        <div style={{
+          fontFamily: 'var(--font-display, serif)', fontSize: 18,
+          fontWeight: 700, color: 'var(--text-muted)',
+        }}>
+          {BRAND.nameBase}<span style={{ color: 'var(--accent)' }}>{BRAND.nameAccent}</span>
+        </div>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Link href="/privacy" style={{ fontSize: 13, color: 'var(--text-dim)', textDecoration: 'none' }}>
+            Privacy
+          </Link>
+          <Link href="/terms" style={{ fontSize: 13, color: 'var(--text-dim)', textDecoration: 'none' }}>
+            Terms
+          </Link>
+          <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>
+            Real commitments. Real people. — {BRAND.legal}
+          </span>
         </div>
       </footer>
+
     </div>
   );
 }

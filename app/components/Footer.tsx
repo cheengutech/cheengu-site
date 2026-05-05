@@ -1,16 +1,40 @@
 import Link from 'next/link';
+import { BRAND } from '../brand';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1a1a1a] border-t border-[#333] py-12 text-center text-[#666] text-sm mt-20">
-      <p>&copy; 2025 Cheengu. All rights reserved.</p>
-      <p className="mt-2">
-        <Link href="/privacy" className="text-[#888] hover:text-white">Privacy Policy</Link>
-        {' | '}
-        <Link href="/terms" className="text-[#888] hover:text-white">Terms of Service</Link>
-        {' | '}
-        <Link href="/contact" className="text-[#888] hover:text-white">Contact</Link>
-      </p>
+    <footer
+      style={{
+        borderTop: '1px solid var(--border)',
+        padding: '32px 40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        maxWidth: 1100,
+        margin: '0 auto',
+      }}
+    >
+      <div
+        style={{
+          fontFamily: 'var(--font-display, serif)',
+          fontSize: 18,
+          fontWeight: 700,
+          color: 'var(--text-muted)',
+        }}
+      >
+        {BRAND.nameBase}<span style={{ color: 'var(--accent)' }}>{BRAND.nameAccent}</span>
+      </div>
+      <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+        <Link href="/privacy" style={{ fontSize: 13, color: 'var(--text-dim)', textDecoration: 'none' }}>
+          Privacy
+        </Link>
+        <Link href="/terms" style={{ fontSize: 13, color: 'var(--text-dim)', textDecoration: 'none' }}>
+          Terms
+        </Link>
+        <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>
+          © {new Date().getFullYear()} {BRAND.legal}
+        </span>
+      </div>
     </footer>
   );
 }

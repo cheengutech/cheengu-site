@@ -1,19 +1,38 @@
 import Link from 'next/link';
+import { BRAND } from '../brand';
 
 export default function Navigation() {
   return (
-    <nav className="bg-[#1a1a1a] border-b border-[#333] sticky top-0 z-50">
-      <div className="max-w-[1200px] mx-auto px-5 py-4 flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-white">
-          Cheengu
-        </Link>
-        <ul className="flex gap-8">
-          <li><Link href="/how-it-works" className="text-[#888] hover:text-white text-sm transition-colors">How It Works</Link></li>
-          <li><Link href="/contact" className="text-[#888] hover:text-white text-sm transition-colors">Contact</Link></li>
-          <li><Link href="/privacy" className="text-[#888] hover:text-white text-sm transition-colors">Privacy</Link></li>
-          <li><Link href="/terms" className="text-[#888] hover:text-white text-sm transition-colors">Terms</Link></li>
-        </ul>
-      </div>
+    <nav
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+        padding: '20px 40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        background: 'rgba(12,11,9,0.9)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid var(--border)',
+      }}
+    >
+      <Link
+        href="/"
+        style={{
+          fontFamily: 'var(--font-display, serif)',
+          fontSize: 20,
+          fontWeight: 700,
+          color: 'var(--text)',
+          textDecoration: 'none',
+          letterSpacing: '-0.3px',
+        }}
+      >
+        {BRAND.nameBase}<span style={{ color: 'var(--accent)' }}>{BRAND.nameAccent}</span>
+      </Link>
     </nav>
   );
 }
